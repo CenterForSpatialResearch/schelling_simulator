@@ -46,11 +46,14 @@ function mouseClicked() {
             console.log('DONE')
             break
         }
+        console.log(index)
         if (!isHappy(index)) {
-            console.log(isHappy(index, null, true))
+            let happy = isHappy(index, null, true)
+            console.log(happy)
             let new_position = moveAgent(index)    
             console.log('\t\tmoved', index, new_position)      
-            console.log(isHappy(index, null, true))
+            happy = isHappy(new_position, null, true)
+            console.log(happy)
             if (new_position) {
                 break
             }
@@ -61,6 +64,9 @@ function mouseClicked() {
 function isHappy(c, value=null, verbose=false) {
     if (value == null) {
         if (cells[c] == null) {
+            if (verbose) {
+                console.log("\tspace is null")
+            }
             return true
         } else {
             value = cells[c]
