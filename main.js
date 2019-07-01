@@ -33,46 +33,27 @@ function setup() {
 
 function draw() {
     background(255)
-
     text(getCellString(), 10, 10, 490)    
-}
-
-function mouseClicked() {
     let checked = 0
     while (true) {
         index++
         index %= ROWS * COLUMNS
         if (checked++ == cells.length) {
             console.log('DONE')
+            frameRate(0)
             break
         }
-        console.log(index)
-        if (!isHappy(index)) {
-            let happy = isHappy(index, null, true)
-            console.log(happy)
-            let new_position = moveAgent(index)    
-            console.log('\t\tmoved', index, new_position)      
-            happy = isHappy(new_position, null, true)
-            console.log(happy)
-            if (new_position) {
+        let value = cells[index]
+        if (!isHappy(index, value)) {
+            if (moveAgent(index)) {
                 break
             }
         }
     }
 }
 
-function isHappy(c, value=null, verbose=false) {
-    if (value == null) {
-        if (cells[c] == null) {
-            if (verbose) {
-                console.log("\tspace is null")
-            }
-            return true
-        } else {
-            value = cells[c]
-        }
-    }
-    let neighbors = getNeighbors(c)
+function isHappy(index, value, discount=0) {
+    let neighbors = getNeighbors(index)
     let total = 0
     let same = 0
     for (let neighbor of neighbors) {
@@ -87,19 +68,18 @@ function isHappy(c, value=null, verbose=false) {
     if (total == 0) {
         return false
     }
+    same -= discount
     let ratio = same / total
-    if (verbose) {
-        console.log("\tratio", ratio, same, total)
-    }
     return ratio >= RATIO ? true : false
 }
 
-
 function moveAgent(index) {
     let open_cells = []
+    let value = cells[index]
     for (let c=0; c<cells.length; c++) {
         if (cells[c] == null) {
-            if (isHappy(c, cells[index])) {
+            let discount = manhattanDistance(index, c) == 1 ? 1 : 0
+            if (isHappy(c, value, discount)) {
                 open_cells.push(c)
             }
         }
@@ -127,21 +107,6 @@ function manhattanDistance(c1, c2) {
     let row_2 = int(c2 / COLUMNS)
     let column_2 = c2 % COLUMNS
     return abs(row_1 - row_2) + abs(column_1 - column_2)
-}
-
-function getCellString() {
-    let content = ""
-    for (let cell of cells) {
-        if (cell == 1) {
-            content += '#'
-        } else if (cell == 0) {
-            content += 'O'
-        } else {
-            content += ' '
-        }
-        content += ' '
-    }
-    return content
 }
 
 function getNeighbors(c) {          // cache this
@@ -177,3 +142,17 @@ function getNeighbors(c) {          // cache this
     return neighbors
 }
 
+function getCellString() {
+    let content = ""
+    for (let cell of cells) {
+        if (cell == 1) {
+            content += '#'
+        } else if (cell == 0) {
+            content += 'O'
+        } else {
+            content += ' '
+        }
+        content += ' '
+    }
+    return content
+}
