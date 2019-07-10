@@ -16,8 +16,8 @@ function setup() {
     canvas.parent('p5') 
     strokeWeight(2)
     rect(0, 0, width, height)
-    textFont('monospace')
-    textSize(25)
+    textFont('Anonymous Pro')
+    textSize(28)
     textAlign(LEFT, TOP)
     frameRate(10)
     init()
@@ -182,7 +182,7 @@ function getCellString() {
         if (cell == 1) {
             content += '#'
         } else if (cell == 0) {
-            content += 'O'
+            content += 'o'
         } else {
             content += ' '
         }
