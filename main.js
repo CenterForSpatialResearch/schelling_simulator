@@ -9,6 +9,8 @@ const RATIO = 0.5
 let cells = []
 let index = 0
 
+let countup = 0
+
 function setup() {
     let canvas = createCanvas(490, 420)
     canvas.parent('p5') 
@@ -17,6 +19,13 @@ function setup() {
     textFont('monospace')
     textSize(25)
     textAlign(LEFT, TOP)
+    frameRate(10)
+    init()
+}
+
+function init() {
+    cells = []
+    index = 0    
     for (let c=0; c<ROWS * COLUMNS; c++) {
         cells.push(random() > 0.5 ? 1 : 0)
     }
@@ -28,19 +37,25 @@ function setup() {
             blanks--
         }
     }
-    frameRate(10)
 }
 
 function draw() {
     background(255)
     text(getCellString(), 10, 10, 490)    
+    if (countup > 0) {        
+        countup++
+        if (countup == 100) {
+            countup = 0
+            init()
+        }
+    }
     let checked = 0
     while (true) {
         index++
         index %= ROWS * COLUMNS
         if (checked++ == cells.length) {
             console.log('DONE')
-            frameRate(0)
+            countup++
             break
         }
         let value = cells[index]
@@ -53,14 +68,14 @@ function draw() {
 }
 
 function isHappy(index, value, discount=0) {
-    let neighbors = getNeighbors(index)
+    let neighbor_values = getNeighborValues(index)
     let total = 0
     let same = 0
-    for (let neighbor of neighbors) {
-        if (neighbor < 0 || neighbor == null) {
+    for (let neighbor_value of neighbor_values) {
+        if (neighbor_value < 0 || neighbor_value == null) {
             continue
         }
-        if (neighbor == value) {
+        if (neighbor_value == value) {
             same++
         }
         total++
@@ -78,7 +93,7 @@ function moveAgent(index) {
     let value = cells[index]
     for (let c=0; c<cells.length; c++) {
         if (cells[c] == null) {
-            let discount = manhattanDistance(index, c) == 1 ? 1 : 0
+            let discount = getNeighbors(index).includes(c) == 1 ? 1 : 0
             if (isHappy(c, value, discount)) {
                 open_cells.push(c)
             }
@@ -109,35 +124,54 @@ function manhattanDistance(c1, c2) {
     return abs(row_1 - row_2) + abs(column_1 - column_2)
 }
 
+function areNeighbors(c1, c2) {
+    let row_1 = int(c1 / COLUMNS)
+    let column_1 = c1 % COLUMNS
+    let row_2 = int(c2 / COLUMNS)
+    let column_2 = c2 % COLUMNS
+
+}
+
+function getNeighborValues(c) {          // cache this
+    let neighbors = getNeighbors(c)
+    let neighbor_values = []
+    for (let neighbor of neighbors) {
+        if (neighbor != null) {
+            neighbor_values.push(cells[neighbor])
+        }
+    }
+    return neighbor_values
+}
+
 function getNeighbors(c) {          // cache this
     let neighbors = new Array(8)
-    neighbors[0] = cells[c - COLUMNS - 1]
-    neighbors[1] = cells[c - COLUMNS] 
-    neighbors[2] = cells[c - COLUMNS + 1]
-    neighbors[3] = cells[c - 1]
-    neighbors[4] = cells[c + 1]
-    neighbors[5] = cells[c + COLUMNS - 1]
-    neighbors[6] = cells[c + COLUMNS]
-    neighbors[7] = cells[c + COLUMNS + 1]
+    neighbors[0] = c - COLUMNS - 1
+    neighbors[1] = c - COLUMNS
+    neighbors[2] = c - COLUMNS + 1
+    neighbors[3] = c - 1
+    neighbors[4] = c + 1
+    neighbors[5] = c + COLUMNS - 1
+    neighbors[6] = c + COLUMNS
+    neighbors[7] = c + COLUMNS + 1
     if (c < COLUMNS) {
-        neighbors[0] = -1
-        neighbors[1] = -1
-        neighbors[2] = -1
+        neighbors[0] = null
+        neighbors[1] = null
+        neighbors[2] = null
     }
     if (c >= cells.length - COLUMNS) {
-        neighbors[5] = -1
-        neighbors[6] = -1
-        neighbors[7] = -1
+        neighbors[5] = null
+        neighbors[6] = null
+        neighbors[7] = null
     }
     if (c % COLUMNS == 0) {
-        neighbors[0] = -1
-        neighbors[3] = -1
-        neighbors[5] = -1
+        neighbors[0] = null
+        neighbors[3] = null
+        neighbors[5] = null
     }
     if (c % COLUMNS == COLUMNS - 1) {
-        neighbors[2] = -1
-        neighbors[4] = -1
-        neighbors[7] = -1
+        neighbors[2] = null
+        neighbors[4] = null
+        neighbors[7] = null
     }    
     return neighbors
 }
