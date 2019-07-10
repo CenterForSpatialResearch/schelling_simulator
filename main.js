@@ -72,7 +72,7 @@ function isHappy(index, value, discount=0) {
     let total = 0
     let same = 0
     for (let neighbor_value of neighbor_values) {
-        if (neighbor_value < 0 || neighbor_value == null) {
+        if (neighbor_value == null) {
             continue
         }
         if (neighbor_value == value) {
