@@ -2,9 +2,14 @@
 
 // 16x13
 
-const COLUMNS = 16 * 2
-const ROWS = 13 * 2
+// const COLUMNS = 16
+// const ROWS = 13
+const COLUMNS = 32
+const ROWS = 26
+
 const RATIO = 0.5
+const START_CENTER = true
+const TOLERATE_SPACES = true
 
 let cells = []
 let index = 0
@@ -12,6 +17,7 @@ let index = 0
 let countup = 0
 
 function setup() {
+    // let canvas = createCanvas(490, 460)
     let canvas = createCanvas(490 * 2, 460 * 2)
     canvas.parent('p5') 
     strokeWeight(2)
@@ -19,7 +25,7 @@ function setup() {
     textFont('Anonymous Pro')
     textSize(28)
     textAlign(LEFT, TOP)
-    frameRate(10)
+    // frameRate(10)
     init()
 }
 
@@ -37,10 +43,14 @@ function init() {
             blanks--
         }
     }
+    if (START_CENTER) {
+        index = int(cells.length / 2)
+    }    
+    print(index)    
 }
 
 function draw() {
-    background(200)
+    background(255)
     text(getCellString(), 10, 10, width)    
     if (countup > 0) {        
         countup++
@@ -53,6 +63,7 @@ function draw() {
     while (true) {
         index++
         index %= ROWS * COLUMNS
+        // print(checked, cells.length)
         if (checked++ == cells.length) {
             console.log('DONE')
             countup++
@@ -73,7 +84,9 @@ function isHappy(index, value, discount=0) {
     let same = 0
     for (let neighbor_value of neighbor_values) {
         if (neighbor_value == null) {
-            continue
+            if (TOLERATE_SPACES) {
+                continue
+            }
         }
         if (neighbor_value == value) {
             same++
@@ -83,6 +96,7 @@ function isHappy(index, value, discount=0) {
     if (total == 0) {
         return false
     }
+    // print(total, same)
     same -= discount
     let ratio = same / total
     return ratio >= RATIO ? true : false
@@ -105,7 +119,7 @@ function moveAgent(index) {
     let min_distance = 1000
     let closest = null
     for (let c=0; c<open_cells.length; c++) {
-        let distance = manhattanDistance(index, open_cells[c])
+        let distance = linearDistance(index, open_cells[c])
         if (distance < min_distance) {
             min_distance = distance
             closest = open_cells[c]            
@@ -124,11 +138,31 @@ function manhattanDistance(c1, c2) {
     return abs(row_1 - row_2) + abs(column_1 - column_2)
 }
 
-function areNeighbors(c1, c2) {
+function crowDistance(c1, c2) {
     let row_1 = int(c1 / COLUMNS)
     let column_1 = c1 % COLUMNS
     let row_2 = int(c2 / COLUMNS)
     let column_2 = c2 % COLUMNS
+    return sqrt((row_1 - row_2)**2 + (column_1 - column_2)**2)
+}
+
+function linearDistance(c1, c2) {
+
+    // both directions with wrapping
+    // let a = c1 > c2 ? c1 : c2
+    // let b = c1 < c2 ? c1 : c2
+    // return min((b - a), ((a + cells.length) - b))
+
+    // forward only with wrapping
+    let d = c2 - c1
+    if (d < 0) {
+        d += cells.length
+    }
+    return d
+
+    // forwrd and back no-wrapping
+    // return abs(c2 - c1)
+
 
 }
 
@@ -137,7 +171,7 @@ function getNeighborValues(c) {          // cache this
     let neighbor_values = []
     for (let neighbor of neighbors) {
         if (neighbor != null) {
-            neighbor_values.push(cells[neighbor])
+            neighbor_values.push(cells[neighbor])  // indexes to values (null value possible)
         }
     }
     return neighbor_values
