@@ -2,8 +2,8 @@
 
 // 16x13
 
-const COLUMNS = 16
-const ROWS = 13
+const COLUMNS = 16 * 2
+const ROWS = 13 * 2
 const RATIO = 0.5
 
 let cells = []
@@ -12,7 +12,7 @@ let index = 0
 let countup = 0
 
 function setup() {
-    let canvas = createCanvas(490, 420)
+    let canvas = createCanvas(490 * 2, 460 * 2)
     canvas.parent('p5') 
     strokeWeight(2)
     rect(0, 0, width, height)
@@ -40,8 +40,8 @@ function init() {
 }
 
 function draw() {
-    background(255)
-    text(getCellString(), 10, 10, 490)    
+    background(200)
+    text(getCellString(), 10, 10, width)    
     if (countup > 0) {        
         countup++
         if (countup == 100) {
@@ -189,4 +189,12 @@ function getCellString() {
         content += ' '
     }
     return content
+}
+
+let capture = 0
+function mouseClicked() {
+    if (mouseX < width && mouseY < height && mouseX > 0 && mouseY > 0) {
+        save("capture_" + capture + ".png")
+        capture += 1
+    }
 }
