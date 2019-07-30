@@ -7,8 +7,8 @@
 const COLUMNS = 32
 const ROWS = 26
 
-const RATIO = 0.5
-const START_CENTER = true
+const RATIO = 0.75
+const START_CENTER = false
 const TOLERATE_SPACES = true
 
 let cells = []
