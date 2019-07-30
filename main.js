@@ -4,11 +4,11 @@
 
 // const COLUMNS = 16
 // const ROWS = 13
-const COLUMNS = 32
-const ROWS = 26
+const COLUMNS = 29
+const ROWS = 23
 
-const RATIO = 0.75
-const START_CENTER = false
+const RATIO = 0.7
+const START_CENTER = true
 const TOLERATE_SPACES = true
 
 let cells = []
@@ -18,7 +18,7 @@ let countup = 0
 
 function setup() {
     // let canvas = createCanvas(490, 460)
-    let canvas = createCanvas(490 * 2, 460 * 2)
+    let canvas = createCanvas(900, 460 * 2)
     canvas.parent('p5') 
     strokeWeight(2)
     rect(0, 0, width, height)
